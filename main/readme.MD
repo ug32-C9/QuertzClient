@@ -1,2 +1,2 @@
-# QuertzClient MacOS
-This is the release version of QuertzClient MacOS.
+# Ronix MacOS
+This is the release version of Velonix MacOS.
