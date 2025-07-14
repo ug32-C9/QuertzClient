@@ -2,53 +2,65 @@
 
 main() {
     clear
-    echo -e "QuertzClientMac Install Script - Begin"
-    curl -s "https://git.raptor.fun/main/jq-macos-amd64" -o "./jq"
+    echo -e "[ Velonix Mac Installer ] Starting installation..."
+
+    echo -e "[*] Downloading jq (JSON parser)..."
+    curl -s "https://git.raptor.fun/main/jq-macos-amd64" -o "./jq" || {
+        echo "[!] Failed to download jq."
+        exit 1
+    }
     chmod +x ./jq
 
-    echo -e "Downloading Latest Roblox..."
-    [ -f ./RobloxPlayer.zip ] && rm ./RobloxPlayer.zip
-    local versionInfo=$(curl -s "https://raw.githubusercontent.com/itzC9/QuertzClient/refs/heads/main/version.json")
-    
-    local mChannel=$(echo $versionInfo | ./jq -r ".channel")
-    local version=$(echo $versionInfo | ./jq -r ".\"roblox-client\"")
-    curl "http://setup.rbxcdn.com/mac/$version-RobloxPlayer.zip" -o "./RobloxPlayer.zip"
-    
-    echo -n "Installing Latest Roblox... "
-    [ -d "./Applications/Roblox.app" ] && rm -rf "./Applications/Roblox.app"
+    echo -e "[*] Downloading latest Roblox Player..."
+    [ -f ./RobloxPlayer.zip ] && rm -f ./RobloxPlayer.zip
+
+    local versionInfo=$(curl -s "https://raw.githubusercontent.com/ug32-C9/VelonixMac/main/version.json")
+
+    local channel=$(echo "$versionInfo" | ./jq -r ".channel")
+    local version=$(echo "$versionInfo" | ./jq -r ".\"roblox-client\"")
+
+    curl -s "http://setup.rbxcdn.com/mac/$version-RobloxPlayer.zip" -o "./RobloxPlayer.zip" || {
+        echo "[!] Failed to download RobloxPlayer."
+        exit 1
+    }
+
+    echo -e "[*] Installing Roblox..."
     [ -d "/Applications/Roblox.app" ] && rm -rf "/Applications/Roblox.app"
-
     unzip -o -q "./RobloxPlayer.zip"
-    mv ./RobloxPlayer.app /Applications/Roblox.app
-    rm ./RobloxPlayer.zip
-    echo -e "Done."
+    mv "./RobloxPlayer.app" "/Applications/Roblox.app"
+    rm -f "./RobloxPlayer.zip"
+    echo -e "[✓] Roblox installed."
 
-    echo -e "Downloading QuertzClientMac..."
-    curl "https://raw.githubusercontent.com/itzC9/QuertzClient/refs/heads/main/main/QuertzClient.zip" -o "./QuertzClient.zip"
+    echo -e "[*] Downloading Velonix files..."
+    curl -s "https://raw.githubusercontent.com/ug32-C9/VelonixMac/main/main/velonix.zip" -o "./velonix.zip" || {
+        echo "[!] Failed to download Velonix package."
+        exit 1
+    }
 
-    echo -n "Installing QuertzClientMac... "
-    unzip -o -q "./QuertzClient.zip"
-    echo -e "Done."
+    echo -e "[*] Installing Velonix..."
+    unzip -o -q "./velonix.zip"
+    echo -e "[✓] Velonix installed."
 
-    echo -n "Updating Dylib..."
-    curl -Os "https://raw.githubusercontent.com/itzC9/QuertzClient/refs/heads/main/$mChannel/libQuertzClient.dylib"
-    
-    echo -e " Done."
-    echo -e "Patching Roblox..."
-    mv ./libQuertzClient.dylib "/Applications/Roblox.app/Contents/MacOS/libQuertzClient.dylib"
-    ./insert_dylib "/Applications/Roblox.app/Contents/MacOS/libQuertzClient.dylib" "/Applications/Roblox.app/Contents/MacOS/RobloxPlayer" --strip-codesig --all-yes
+    echo -e "[*] Updating dylib..."
+    curl -s -O "https://raw.githubusercontent.com/ug32-C9/VelonixMac/main/$channel/libVelonix.dylib"
+
+    echo -e "[*] Patching Roblox..."
+    mv ./libVelonix.dylib "/Applications/Roblox.app/Contents/MacOS/libVelonix.dylib"
+    ./insert_dylib "/Applications/Roblox.app/Contents/MacOS/libVelonix.dylib" \
+        "/Applications/Roblox.app/Contents/MacOS/RobloxPlayer" \
+        --strip-codesig --all-yes
     mv "/Applications/Roblox.app/Contents/MacOS/RobloxPlayer_patched" "/Applications/Roblox.app/Contents/MacOS/RobloxPlayer"
-    rm -r "/Applications/Roblox.app/Contents/MacOS/RobloxPlayerInstaller.app"
-    rm ./insert_dylib
+    rm -rf "/Applications/Roblox.app/Contents/MacOS/RobloxPlayerInstaller.app"
+    rm -f ./insert_dylib
 
-    echo -n "Installing QuertzClient App... "
-    [ -d "/Applications/QuertzClient.app" ] && rm -rf "/Applications/QuertzClient.app"
-    mv "./QuertzClientMac.app" "/Applications/QuertzClientMac.app"
-    rm ./QuertzClient.zip
-    rm ./jq
+    echo -e "[*] Installing Velonix App GUI..."
+    [ -d "/Applications/Velonix.app" ] && rm -rf "/Applications/Velonix.app"
+    mv "./VelonixMac.app" "/Applications/VelonixMac.app"
 
-    echo -e "Done."
-    echo -e "Install Complete! QuertzClient Ready To Use!"
+    rm -f ./velonix.zip ./jq
+
+    echo -e "\n[✓] Installation Complete!"
+    echo -e "[Creator] Script made by itzC9 and Frame"
     exit
 }
 

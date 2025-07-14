@@ -1,8 +1,8 @@
 {
-    "roblox-client": "version-82f8ee8d17124507",
-    "QuertzClient-ui": "release1",
-    "QuertzClient-client": "release1",
+    "roblox-client": "version-db859ae17f144eea",
+    "ronix-ui": "release1",
+    "ronix-client": "release2",
     "release-tag": "1.0.0",
     "channel": "main",
-    "changelog": ""
+    "changelog": "Version Update"
 }
